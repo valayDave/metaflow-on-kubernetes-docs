@@ -2,5 +2,5 @@
 
 - Creates the Pods and Services for the Metaflow metadata service. 
 - Setups: 
-    - Postgres : Service, Deployment, Persistant Volume and Persistant Volume
+    - Postgres : Service, Deployment, Persistant Volume and Persistant Volume Claim
     - Metaflow_Service : Deployment,service 

@@ -3,7 +3,23 @@
 This Repository will contain the basic scripts and files needed to setup Kubernetes cluster for running and working with Metaflow. 
 It contains Kops setup and Kubernetes templates to deploy necessary services on kubernetes. 
 
-# Kops Guide. 
+# Metaflow Kubernetes Plugin
+
+## Installing Plugin Metaflow Repo
+- ``pip install https://github.com/valayDave/metaflow/archive/kube_cpu_stable.zip``
+
+## Using The Plugin 
+- Usage is very similar to `@batch` decorator. 
+- on top of any `@step` add the `@kube` decorator or use `--with kube:cpu=2,memory=4000,image=python:3.7` in the CLI args. 
+- To run with Conda it will need `'python-kubernetes':'10.0.1'` in the libraries argument to `@conda_base` step decorator
+- Supports workflow orchestration within container and from local/remote machine. When Metaflow Runtime(workflow) within container, pass the `METAFLOW_RUNTIME_IN_CLUSTER=yes` environment variable to container. Check documentation in *Deploying Metaflow Job into Kubernetes*
+
+## CLI Operations Available with Kube: 
+- ``python multi_step_mnist.py kube list`` : Show the currently running jobs of flow. 
+- ``python multi_step_mnist.py kube kill`` : Kills all jobs on Kube. Any Metaflow Runtime accessing those jobs will be gracefully exited. 
+
+
+# Kops Guide For Cluster Setup 
 
 ## Admin Guide 
 This Involves the steps the admin needs to take to Setup cluster and some useful commands that will help maintain things around the cluster. 
@@ -80,7 +96,7 @@ This involves using AWS Creds to set environment variables that give access to a
 # Deploying Metaflow Job into Kubernetes
 
 - Requirements:
-    - Create a Dockerfile which will build your metaflow Flow into an image
+    - Create a Dockerfile which will build your metaflow Flow into an image. Include data if necessary, otherwise it should come from S3 in the flow. 
         ```dockerfile
         # this is an example Docker file of how to create and image of the Metaflow Run and Put it on Kubernetes. 
         FROM python:3.7
