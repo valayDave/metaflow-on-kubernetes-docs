@@ -1,0 +1,41 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: metaflow-native-runtime-job-test
+spec:
+  template:
+    spec:
+      containers:
+        - name: metaflow-native-runtime
+          image: valaygaurang/metaflow:multi_step_mnist_example-in-cluster
+          args:
+            [
+              "--with",
+              "kube:cpu=2,memory=2000,image=tensorflow/tensorflow:latest-py3",
+              "run",
+              "--num_training_examples",
+              "40000",
+            ]
+          env:
+            - name: AWS_ACCESS_KEY_ID
+              value: <ACCESS_TOKEN_COMES_HERE>
+            - name: AWS_SECRET_ACCESS_KEY
+              value: <SECRET_VALUE_COMES_HERE>
+            - name: AWS_DEFAULT_REGION
+              value: <AWS_REGION_COMES_HERE>
+            - name: METAFLOW_SERVICE_URL
+              value: http://metaflow-metadata-service.default.svc.cluster.local/ # $ This is what is set in the Metaflow_service/service_app/metaflow-metadata-service-deployment.yaml
+            - name: METAFLOW_DEFAULT_METADATA
+              value: service
+            - name: METAFLOW_DATASTORE_SYSROOT_S3
+              value: s3://<S3_ROOT>
+            - name: METAFLOW_DATATOOLS_SYSROOT_S3
+              value: s3://<S3_ROOT>data
+            - name: METAFLOW_DEFAULT_DATASTORE
+              value: s3
+            - name: USERNAME
+              value: <USERNAME> 
+            - name: METAFLOW_RUNTIME_IN_CLUSTER
+              value: 'yes' # $ Important environment variable. 
+      restartPolicy: Never
+  backoffLimit: 4
