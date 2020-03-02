@@ -8,15 +8,30 @@ It contains Kops setup and Kubernetes templates to deploy necessary services on 
 ## Installing Plugin Metaflow Repo
 - ``pip install https://github.com/valayDave/metaflow/archive/kube_cpu_stable.zip``
 
+
 ## Using The Plugin 
 - Usage is very similar to `@batch` decorator. 
 - on top of any `@step` add the `@kube` decorator or use `--with kube:cpu=2,memory=4000,image=python:3.7` in the CLI args. 
+- To directly deploy the entire runtime into Kubernetes as a job, using the `kube-deploy run` command: 
+    -  ``python multi_step_mnist.py --with kube:cpu=3.2,memory=4000,image=tensorflow/tensorflow:latest-py3 kube-deploy run --num_training_examples 1000 --dont-exit``
+    - ``--dont-exit`` will follow log trail from the job. Otherwise the workflow will be deployed as a job on Kubernetes which will destroy itself once it ends. 
+    - ***Directly deploy to kubernetes only works with Service based Metaprovider***
+    - Good practice before directly moving to `kube-deploy` would be: 
+        - Local tests : ``python multi_step_mnist.py run --num_training_examples 1000`` : With or without Conda. 
+        - Dry run with ``python multi_step_mnist.py --with kube:cpu=3.2,memory=4000,image=tensorflow/tensorflow:latest-py3 run --num_training_examples 1000``
+        - On successful dry run : ``python multi_step_mnist.py --with kube:cpu=3.2,memory=4000,image=tensorflow/tensorflow:latest-py3 kube-deploy run --num_training_examples 50000`` : Run Larger Dataset. 
+
+### Running with Conda 
 - To run with Conda it will need `'python-kubernetes':'10.0.1'` in the libraries argument to `@conda_base` step decorator
-- Supports workflow orchestration within container and from local/remote machine. When Metaflow Runtime(workflow) within container, pass the `METAFLOW_RUNTIME_IN_CLUSTER=yes` environment variable to container. Check documentation in *Deploying Metaflow Job into Kubernetes*
+- Use `image=python:3.6` when running with Conda in `--with kube:`. Ideally that should be the python version used/mentioned in conda.  
+- Direct deploy to kubernetes with Conda environment is supported 
+    - ``python multi_step_mnist.py --with kube:cpu=3.2,memory=4000,image=python:3.6 --environment=conda kube-deploy run --num_training_examples 1000 --dont-exit``
+    - Ensure to use `image=python:<conda_python_version>`
 
 ## CLI Operations Available with Kube: 
 - ``python multi_step_mnist.py kube list`` : Show the currently running jobs of flow. 
 - ``python multi_step_mnist.py kube kill`` : Kills all jobs on Kube. Any Metaflow Runtime accessing those jobs will be gracefully exited. 
+- ``python multi_step_mnist.py kube-deploy run`` : Will run the Metaflow Runtime inside a container on kubernetes cluster. Needs metadata service to work.  
 
 
 # Kops Guide For Cluster Setup 
@@ -95,70 +110,7 @@ This involves using AWS Creds to set environment variables that give access to a
 
 # Deploying Metaflow Job into Kubernetes
 
-- Requirements:
-    - Create a Dockerfile which will build your metaflow Flow into an image. Include data if necessary, otherwise it should come from S3 in the flow. 
-        ```dockerfile
-        # this is an example Docker file of how to create and image of the Metaflow Run and Put it on Kubernetes. 
-        FROM python:3.7
-
-        RUN pip install https://github.com/valayDave/metaflow/archive/kube_cpu_stable.zip
-        RUN pip install numpy
-
-        WORKDIR /app
-
-        COPY ./data /app/data
-        COPY ./multi_step_mnist.py /app/multi_step_mnist.py
-
-        ENTRYPOINT [ "python",'/app/multi_step_mnist.py']
-        ``` 
-    - Build image of the repo : `docker build -t "<dockerhubid>/<image_name>:<tag>" .`
-    - Push to docker Hub : `docker push <dockerhubid>/<image_name>:<tag>`     
-
 - ``kubectl create -f metaflow-native-cluster-role.yml`` : this will allocate the a cluster role to allow deployments from within a cluster. 
-- Sample Deployment file : 
-    ```yml
-    apiVersion: batch/v1
-    kind: Job
-    metadata:
-    name: metaflow-native-runtime-job-test
-    spec:
-    template:
-        spec:
-        containers:
-            - name: metaflow-native-runtime
-            image: valaygaurang/metaflow:multi_step_mnist_example-in-cluster # Image of the Metaflow Run. 
-            args:
-                [
-                "--with",
-                "kube:cpu=2,memory=2000,image=tensorflow/tensorflow:latest-py3",
-                "run",
-                "--num_training_examples",
-                "40000",
-                ]
-            env:
-                - name: AWS_ACCESS_KEY_ID
-                value: <ACCESS_TOKEN_COMES_HERE>
-                - name: AWS_SECRET_ACCESS_KEY
-                value: <SECRET_VALUE_COMES_HERE>
-                - name: AWS_DEFAULT_REGION
-                value: <AWS_REGION_COMES_HERE>
-                - name: METAFLOW_SERVICE_URL
-                value: http://metaflow-metadata-service.default.svc.cluster.local/ # $ This is what is set in the Metaflow_service/service_app/metaflow-metadata-service-deployment.yaml
-                - name: METAFLOW_DEFAULT_METADATA
-                value: service
-                - name: METAFLOW_DATASTORE_SYSROOT_S3
-                value: s3://<S3_ROOT>
-                - name: METAFLOW_DATATOOLS_SYSROOT_S3
-                value: s3://<S3_ROOT>data
-                - name: METAFLOW_DEFAULT_DATASTORE
-                value: s3
-                - name: USERNAME
-                value: <USERNAME> 
-                - name: METAFLOW_RUNTIME_IN_CLUSTER # Important Environment variable to make it run with a Kube Cluster. 
-                value: 'yes'
-        restartPolicy: Never
-    backoffLimit: 4
-    ```
-- Deploy the job using : ``kubectl create -f metaflow-job-runner.yml``
+- The plugin supports deploying a Metaflow-runtime into kubernetes. use the `kube-deploy run` command with any Flow to deploy directly to Kubernetes. Check usage example [here](https://github.com/valayDave/metaflow-kube-demo). The ``metaflow-native-cluster-role.yml`` enables the Metaflow plugin to work within Kubernetes to orchestrate jobs using the using its native runtime. It is basically allowing `default` kubernetes namespace to have an admin role in deployment.(I know not the best. But its a demo. Will Figure better security.)  
 - Once Done Executing : 
     - Once the``kubectl port-forward deployment/metaflow-metadata-service 8080:8080`` to port forward metatdata service for accesss on localmachine. Please note that because this is directly port forwarding to the pod were are taking the 8080 port for the service. 
