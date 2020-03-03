@@ -116,7 +116,6 @@ This involves using AWS Creds to set environment variables that give access to a
     ```json
     {
         "METAFLOW_BATCH_CONTAINER_IMAGE":"python:x.y",
-        "METAFLOW_BATCH_JOB_QUEUE": "arn:aws:batch:us-east-1:111111111111:job-queue/Metaflow-Job-Q",
         "METAFLOW_DATASTORE_SYSROOT_S3": "s3://<S3_BUCKET_URL>",
         "METAFLOW_DATATOOLS_SYSROOT_S3": "s3://<S3_BUCKET_URL>/data",
         "METAFLOW_DEFAULT_DATASTORE": "s3",
