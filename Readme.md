@@ -32,6 +32,7 @@ It contains Kops setup and Kubernetes templates to deploy necessary services on 
 - ``python multi_step_mnist.py kube list`` : Show the currently running jobs of flow. 
 - ``python multi_step_mnist.py kube kill`` : Kills all jobs on Kube. Any Metaflow Runtime accessing those jobs will be gracefully exited. 
 - ``python multi_step_mnist.py kube-deploy run`` : Will run the Metaflow Runtime inside a container on kubernetes cluster. Needs metadata service to work.  
+- ``python multi_step_mnist.py kube-deploy list`` : It will list any running deployment of the current flow on Kubernetes. 
 
 
 # Kops Guide For Cluster Setup 
@@ -111,6 +112,18 @@ This involves using AWS Creds to set environment variables that give access to a
 # Deploying Metaflow Job into Kubernetes
 
 - ``kubectl create -f metaflow-native-cluster-role.yml`` : this will allocate the a cluster role to allow deployments from within a cluster. 
-- The plugin supports deploying a Metaflow-runtime into kubernetes. use the `kube-deploy run` command with any Flow to deploy directly to Kubernetes. Check usage example [here](https://github.com/valayDave/metaflow-kube-demo). The ``metaflow-native-cluster-role.yml`` enables the Metaflow plugin to work within Kubernetes to orchestrate jobs using the using its native runtime. It is basically allowing `default` kubernetes namespace to have an admin role in deployment.(I know not the best. But its a demo. Will Figure better security.)  
+- Example Metaflow Config for using `kube-deloy run` with cluster and services created from above steps. The url in examples is derived from [service deployment](Metaflow_service/service_app/metaflow-metadata-service.yaml)
+    ```json
+    {
+        "METAFLOW_BATCH_CONTAINER_IMAGE":"python:x.y",
+        "METAFLOW_BATCH_JOB_QUEUE": "arn:aws:batch:us-east-1:111111111111:job-queue/Metaflow-Job-Q",
+        "METAFLOW_DATASTORE_SYSROOT_S3": "s3://<S3_BUCKET_URL>",
+        "METAFLOW_DATATOOLS_SYSROOT_S3": "s3://<S3_BUCKET_URL>/data",
+        "METAFLOW_DEFAULT_DATASTORE": "s3",
+        "METAFLOW_SERVICE_URL":"http://metaflow-metadata-service.default.svc.cluster.local/",
+        "METAFLOW_DEFAULT_METADATA": "service"
+    }
+    ```
+- The plugin supports deploying a Metaflow-runtime into kubernetes. use the `kube-deploy run` command with any Flow to deploy directly to Kubernetes. Check usage example [here](https://github.com/valayDave/metaflow-kube-demo). The ``metaflow-native-cluster-role.yml`` enables the Metaflow plugin to work within Kubernetes to orchestrate jobs using the using its native runtime. It is basically allowing `default` kubernetes namespace to have an admin role in deployment.(Security not top notch for purpose of demo)  
 - Once Done Executing : 
-    - Once the``kubectl port-forward deployment/metaflow-metadata-service 8080:8080`` to port forward metatdata service for accesss on localmachine. Please note that because this is directly port forwarding to the pod were are taking the 8080 port for the service. 
+    - Once the ``kubectl port-forward deployment/metaflow-metadata-service 8080:8080`` to port forward metatdata service for accesss on localmachine. Please note that because this is directly port forwarding to the pod were are taking the 8080 port for the service. 
