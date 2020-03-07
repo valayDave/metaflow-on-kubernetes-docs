@@ -1,20 +1,20 @@
 # $ Setup Kubecluster
-export AWS_PROFILE=default
+export AWS_PROFILE=metaflow_admin
 # Keeping k8s.local as domain root ensure private DNS and No need for Public DNS. 
 export DOMAIN_ROOT=k8s.local
-export CLUSTER_NAME=dev.$DOMAIN_ROOT
+export CLUSTER_NAME=metaflow.$DOMAIN_ROOT
 export KOPS_BUCKET=$CLUSTER_NAME-test-store
 export KOPS_STATE_STORE=s3://$KOPS_BUCKET
 
 aws s3api create-bucket \
-    --bucket $KOPS_BUCKET \
-    --region us-east-1
+    --bucket $KOPS_BUCKET 
 
 aws s3api put-bucket-versioning --bucket $KOPS_BUCKET  --versioning-configuration Status=Enabled
 
-kops create cluster --zones=us-east-1c --dns private --master-size t2.micro --master-count 3 --node-size c4.xlarge --node-count 3 $CLUSTER_NAME
+kops create cluster --zones=us-west-2c --dns private --master-size t2.micro --master-count 3 --node-size t2.2xlarge --node-count 3 $CLUSTER_NAME
 
 kops validate cluster $CLUSTER_NAME # Runs and CHecks the state of the Cluster. 
+
 
 # $ DELETE CLUSTER COMPLETELY 
 # kops delete cluster dev.k8s.local --yes

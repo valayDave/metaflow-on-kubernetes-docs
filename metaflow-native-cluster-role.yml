@@ -1,13 +1,12 @@
 ---
 # NOTE: The service account `default:default` already exists in k8s cluster.
 # You can create a new account following like this:
-#---
-#apiVersion: v1
-#kind: ServiceAccount
-#metadata:
-#  name: <new-account-name>
-#  namespace: <namespace> 
-
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+   name: metaflow-deployment-service-account # 
+   namespace: metaflow-deployments     # From metaflow-cluster-core-namespaces.yml . Segregated so that cluster access for metaflow deployments only get privilages to spawn clusters. 
+---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
@@ -15,9 +14,9 @@ metadata:
 subjects: # This will change with a namespace deployment. 
   - kind: ServiceAccount
     # Reference to upper's `metadata.name`
-    name: default
+    name: metaflow-deployment-service-account
     # Reference to upper's `metadata.namespace`
-    namespace: default
+    namespace: metaflow-deployments
 roleRef:
   kind: ClusterRole
   name: cluster-admin
