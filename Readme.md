@@ -28,6 +28,31 @@ It contains Kops setup and Kubernetes templates to deploy necessary services on 
     - ``python multi_step_mnist.py --with kube:cpu=3.2,memory=4000,image=python:3.6 --environment=conda kube-deploy run --num_training_examples 1000 --dont-exit``
     - Ensure to use `image=python:<conda_python_version>`
 
+### Small Example Flow 
+```python
+from metaflow import FlowSpec, step,kube
+class HelloKubeFlow(FlowSpec):
+    
+    @step
+    def start(self):
+        print("running Next Step on Kube")
+        self.next(self.kube_step)
+    
+    @kube(cpu=1,memory=2000)
+    @step
+    def kube_step(self):
+        print("Hello I am Running within a container")
+        self.next(self.end)
+    
+    @step
+    def end(self):
+        print("Done Computation")
+
+if __name__== '__main__':
+    HelloKubeFlow()
+```
+- Try it with Minikube.  
+
 ## CLI Operations Available with Kube: 
 - ``python multi_step_mnist.py kube list`` : Show the currently running jobs of flow. 
 - ``python multi_step_mnist.py kube kill`` : Kills all jobs on Kube. Any Metaflow Runtime accessing those jobs will be gracefully exited. 
@@ -84,36 +109,38 @@ This Involves the steps the admin needs to take to Setup cluster and some useful
     ```
 - run : ``kops update cluster $CLUSTER_NAME --yes``
 
-- Setup Services Around Metaflow Using : `sh metaflow_cluster_services_setup.sh`. Contains documentation on whats inside each. 
+- Setup Services Around Metaflow Using : `sh metaflow_cluster_services_setup.sh`. It set's up : 
+    - `metaflow-services` : Namespace where metaflow related services like DB and Metadataprovider are deployed. 
+    - `metaflow-deployments`: Namespace where containers pertaining to metaflow steps/flows will be deployed. Has a cluster has a role set via `metaflow-native-cluster-role.yml` which allow containers to orchestrate other containers within the cluster. 
+    - Seperate namespaces ensure efficient clearing of pods/jobs/services within deployments without affecting metaflow-services
 
 ## User Guide
 
 This involves using AWS Creds to set environment variables that give access to a bucket from which the `kubecfg` can be retrieved.
 
-- Steps:
-    1. install kops, kubectl on your CI server.
-    2. config the AWS access credential on your CI server (either via IAM Role or simply env vars), make sure it has access to your s3 state store path.
-    3. set env var for kops to access your cluster:
-    ```sh
-    export NAME=${YOUR_CLUSTER_NAME}
-    export KOPS_STATE_STORE=s3://${YOUR_CLUSTER_KOPS_STATE_STORE}
-    ```
-    4. Use kops export command to get the kubecfg needed for running kubectl
-    ``kops export kubecfg ${YOUR_CLUSTER_NAME}``
-        - see https://github.com/kubernetes/kops/blob/master/docs/cli/kops_export.md
+Steps:
+1. install kops, kubectl on your machine.
+2. 2. Configure the AWS access credentials on your machine using awscli. `aws configure` will give a cli to add AWS creds.
+3. Set env var for Kops to access your cluster: 
+```sh
+export DOMAIN_ROOT=k8s.local
+export CLUSTER_NAME=dev.$DOMAIN_ROOT
+export KOPS_BUCKET=$CLUSTER_NAME-test-store
+export KOPS_STATE_STORE=s3://$KOPS_BUCKET
+export NAME=${CLUSTER_NAME}
+export KOPS_STATE_STORE=s3://${YOUR_CLUSTER_KOPS_STATE_STORE}
+```
+4. Use kops export command to get the kubecfg needed for running kubectl
+``kops export kubecfg ${YOUR_CLUSTER_NAME}``
+    - see https://github.com/kubernetes/kops/blob/master/docs/cli/kops_export.md
 
-    5. Now the ~/.kube/config file on your CI server should contain all the information kubectl needs to access your cluster.
+5. Now the ~/.kube/config file on your machine should contain all the information kubectl needs to access your cluster.
 
-
-# `Metaflow_service` 
-
-- This contains the neccessary kube configurations to setup the metaflow environment. 
-- `runner.sh` will create the neccesary Pods/Services on kubernetes for Metaflow Service and its Postgres DB
-- To change secrets, Change the `postgres-secret.yml`
 
 # Deploying Metaflow Job into Kubernetes
 
 - ``kubectl create -f metaflow-native-cluster-role.yml`` : this will allocate the a cluster role to allow deployments from within a cluster. 
+
 - Example Metaflow Config for using `kube-deloy run` with cluster and services created from above steps. The url in examples is derived from [service deployment](Metaflow_service/service_app/metaflow-metadata-service.yaml)
     ```json
    {
@@ -129,6 +156,8 @@ This involves using AWS Creds to set environment variables that give access to a
         "AWS_DEFAULT_REGION" :"us-west-2"
     }
     ```
-- The plugin supports deploying a Metaflow-runtime into kubernetes using the `kube-deploy run` command. Check usage example [here](https://github.com/valayDave/metaflow-kube-demo). The ``metaflow-native-cluster-role.yml`` enables the Metaflow plugin to work within Kubernetes to orchestrate jobs using the using its native runtime within a container in the cluster. It is basically allowing `default` kubernetes namespace to have an admin role in applied to pods within the namespace.(I know not the best. But its a demo. Will Figure better security.)  
+- To import this config and use it will your deployment run `metaflow configure import new_config.json`
+- The plugin supports deploying a Metaflow-runtime into kubernetes using the `kube-deploy run` command. Check usage example [here](https://github.com/valayDave/metaflow-kube-demo).
+
 - Once Done Executing : 
     - Once the ``kubectl port-forward deployment/metaflow-metadata-service 8080:8080`` to port forward metatdata service for accesss on localmachine. Please note that because this is directly port forwarding to the pod were are taking the 8080 port for the service. 
