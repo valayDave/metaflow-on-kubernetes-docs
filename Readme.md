@@ -60,7 +60,7 @@ if __name__== '__main__':
 - ``python multi_step_mnist.py kube-deploy list`` : It will list any running deployment of the current flow on Kubernetes. 
 
 
-# Kops Guide For Cluster Setup 
+# Kops Guide For Cluster Setup / Connection
 
 ## Admin Guide 
 This Involves the steps the admin needs to take to Setup cluster and some useful commands that will help maintain things around the cluster. 
@@ -143,9 +143,10 @@ export KOPS_STATE_STORE=s3://${YOUR_CLUSTER_KOPS_STATE_STORE}
 
 - Example Metaflow Config for using `kube-deloy run` with cluster and services created from above steps. The url in examples is derived from [service deployment](Metaflow_service/service_app/metaflow-metadata-service.yaml)
     ```json
-   {
-        "METAFLOW_DATASTORE_SYSROOT_S3": "s3://metaflow-experiments-datastore/metaflow_store",
-        "METAFLOW_DATATOOLS_SYSROOT_S3": "s3://metaflow-experiments-datastore/metaflow_store/data",
+    {
+        "METAFLOW_BATCH_CONTAINER_IMAGE":"python:x.y",
+        "METAFLOW_DATASTORE_SYSROOT_S3": "s3://<S3_BUCKET_URL>",
+        "METAFLOW_DATATOOLS_SYSROOT_S3": "s3://<S3_BUCKET_URL>/data",
         "METAFLOW_DEFAULT_DATASTORE": "s3",
         "METAFLOW_DEFAULT_METADATA": "service",
         "METAFLOW_SERVICE_URL" : "http://metaflow-metadata-service.metaflow-services.svc.cluster.local/",
