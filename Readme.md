@@ -80,7 +80,7 @@ This Involves the steps the admin needs to take to Setup cluster and some useful
         --region us-east-1
 
     aws s3api put-bucket-versioning --bucket $KOPS_BUCKET  --versioning-configuration Status=Enabled
-    # Ensure private DNS so that this can be done quickly with too much route53 setup. 
+    # Ensure private DNS so that this can be done quickly without too much route53 setup. 
     # This will only setup cluster spec. To actually Launch it the command needs to run with ``--yes``
     kops create cluster --zones=us-east-1c --dns private --master-size t2.micro --master-count 3 --node-size c4.xlarge --node-count 3 $CLUSTER_NAME
     ```
