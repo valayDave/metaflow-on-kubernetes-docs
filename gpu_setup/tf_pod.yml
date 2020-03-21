@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: tf-gpu
+spec:
+  containers:
+  - name: gpu
+    image: tensorflow/tensorflow:1.9.0-gpu
+    imagePullPolicy: IfNotPresent
+    resources:
+      limits:
+        memory: 1024Mi
+        # ^ Set memory in case default limits are set low
+        nvidia.com/gpu: 1 # requesting 1 GPUs
+        # ^ For Legacy Accelerators mode this key must be renamed
+        #   'alpha.kubernetes.io/nvidia-gpu'
+  tolerations:
+  # This toleration will allow the gpu hook to run anywhere
+  #   By default this is permissive in case you have tainted your GPU nodes.
+  - operator: "Exists"
+  # ^ If you have a specific taint to target, comment out the above and modify
+  #   the example below
+
+### Example tolerations
+# - key: "dedicated"
+#   operator: "Equal"
+#   value: "gpu"
+#   effect: "NoExecute"

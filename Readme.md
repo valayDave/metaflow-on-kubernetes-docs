@@ -136,6 +136,9 @@ export KOPS_STATE_STORE=s3://${YOUR_CLUSTER_KOPS_STATE_STORE}
 
 5. Now the ~/.kube/config file on your machine should contain all the information kubectl needs to access your cluster.
 
+## GPU Support 
+
+Check [gpu.md](gpu.md) 
 
 # Deploying Metaflow Job into Kubernetes
 

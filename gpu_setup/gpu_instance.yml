@@ -1,0 +1,19 @@
+apiVersion: kops.k8s.io/v1alpha2
+kind: InstanceGroup
+metadata:
+  name: gpu-nodes
+  labels:
+    kops.k8s.io/cluster: metaflow.k8s.local # This is Set here Permanently. No Dynamic way of doing this. 
+spec:
+  image: kope.io/k8s-1.10-debian-stretch-amd64-hvm-ebs-2018-05-27
+  hooks:
+    - execContainer:
+        image: dcwangmit01/nvidia-device-plugin:0.1.0
+  machineType: p2.xlarge
+  maxSize: 1
+  minSize: 1
+  nodeLabels:
+    kops.k8s.io/instancegroup: gpu-nodes
+  role: Node
+  subnets:
+  - us-west-2c
