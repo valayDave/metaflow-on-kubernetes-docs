@@ -27,7 +27,13 @@ kubectl exec -it tf-gpu -- \
 - Kops using the [gpu_setup/gpu_instance.yml](gpu_setup/gpu_instance.yml) file to Configure the GPU Instances on AWS joininig the Cluster.
     - Constraints : 
         - Cuda Libraries v9.1
-- 
+
+## Cleanup Tasks
+
+### Delete GPU Instance 
+```sh
+kops delete ig gpu-nodes
+```
 
 ## TODO 
 - [ ] Test the Base AMI for KOPS deployment with NVIDIA Provided AMI. 
