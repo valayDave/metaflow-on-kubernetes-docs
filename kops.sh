@@ -11,7 +11,7 @@ aws s3api create-bucket \
 
 aws s3api put-bucket-versioning --bucket $KOPS_BUCKET  --versioning-configuration Status=Enabled
 
-kops create cluster --zones=us-west-2c --dns private --master-size t2.micro --master-count 3 --node-size t2.2xlarge --node-count 3 $CLUSTER_NAME
+kops create cluster --zones=us-west-2c --dns private --master-size t2.micro --master-count 3 --node-size c4.xlarge --node-count 2 --kubernetes-version 1.16.7 $CLUSTER_NAME
 
 kops validate cluster $CLUSTER_NAME # Runs and CHecks the state of the Cluster. 
 

@@ -114,6 +114,13 @@ This Involves the steps the admin needs to take to Setup cluster and some useful
     - `metaflow-deployments`: Namespace where containers pertaining to metaflow steps/flows will be deployed. Has a cluster has a role set via `metaflow-native-cluster-role.yml` which allow containers to orchestrate other containers within the cluster. 
     - Seperate namespaces ensure efficient clearing of pods/jobs/services within deployments without affecting metaflow-services
 
+### GPU Support 
+- GPU Support Documentation Available [Here](gpu.md)
+- GPU Cluster Constraints : 
+    - Cuda Libraries v9.1 on Individual Machines
+    - Docker 18.x on Machine
+    - Kubernetes Version 1.15.x, 1.16.x 
+
 ## User Guide
 
 This involves using AWS Creds to set environment variables that give access to a bucket from which the `kubecfg` can be retrieved.
@@ -136,9 +143,7 @@ export KOPS_STATE_STORE=s3://${YOUR_CLUSTER_KOPS_STATE_STORE}
 
 5. Now the ~/.kube/config file on your machine should contain all the information kubectl needs to access your cluster.
 
-## GPU Support 
 
-Check [gpu.md](gpu.md) 
 
 # Deploying Metaflow Job into Kubernetes
 
