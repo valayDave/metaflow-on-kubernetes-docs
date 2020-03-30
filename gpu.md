@@ -25,19 +25,18 @@ kubectl exec -it tf-gpu -- \
 
 ## Specs
 - Kops using the [gpu_setup/gpu_instance.yml](gpu_setup/gpu_instance.yml) file to Configure the GPU Instances on AWS joininig the Cluster.
-    - Constraints : 
-        - Cuda Libraries v9.1
-        - Docker 18.x on Machine
-        - Kubernetes Version 1.15.x, 1.16.x
+    - Tested ON : 
+      - Kubernetes Version 1.15.x, 1.16.x
+        
+- Cuda Libraries v10.2. [Credits](https://github.com/elevate/nvidia-device-plugin)
 
-- NO CUDA 10.2 Support :  
-  - KOPS Currently Only Support Kubernetes v1.16
-    - K8s v1.16  which uses Docker v18.03. 
-  - K8s v1.17 Support Docker 19.03. 
-    - [NVIDIA Container Toolkit](https://github.com/NVIDIA/nvidia-docker#quickstart) Requires Docker 19.03 and supports CUDA 10.2.
-    - The Older version of this was [nvidia-docker2](https://github.com/NVIDIA/nvidia-docker/wiki/Installation-(version-2.0)) which supported Docker 18.03 and 19.03 
-  - KOPS Supports NVIDIA-Device-Plugin deployments with [nvidia-docker2](https://github.com/NVIDIA/nvidia-docker/wiki/Installation-(version-2.0)) and hence currently has ongoing issues on support for New CUDA Versions. 
-  - KOPS Needs to move to v1.17 of kubernetes to start quick deployments Kubernetes versions which can support Docker 19.03 which inturn will support Latest Nvidia CUDA Toolkit. 
+- To use Cuda 9.1 change the below in [gpu_setup/gpu_instance.yml](gpu_setup/gpu_instance.yml)
+
+```yml
+  hooks:
+    - execContainer:
+        image: dcwangmit01/nvidia-device-plugin:0.1.0
+```
 
 ## Cleanup Tasks
 
@@ -48,8 +47,8 @@ kops delete ig gpu-nodes
 
 
 ## TODO 
-- [ ] Test the Base AMI for KOPS deployment with NVIDIA Provided AMI. 
-    - [ ] Test Cuda Support for v9.1 , v9.2
+- [x] Test Cuda Support for v10.2, 9.1
+
 
 ## References 
 - https://docs.nvidia.com/datacenter/kubernetes/kubernetes-upstream/index.html

@@ -170,3 +170,9 @@ export KOPS_STATE_STORE=s3://${YOUR_CLUSTER_KOPS_STATE_STORE}
 
 - Once Done Executing : 
     - Once the ``kubectl port-forward deployment/metaflow-metadata-service 8080:8080`` to port forward metatdata service for accesss on localmachine. Please note that because this is directly port forwarding to the pod were are taking the 8080 port for the service. 
+
+
+# TODO 
+
+- [ ] Integrate Minio Helm chart to this. 
+- 
