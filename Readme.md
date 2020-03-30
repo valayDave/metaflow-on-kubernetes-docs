@@ -20,7 +20,9 @@ It contains Kops setup and Kubernetes templates to deploy necessary services on 
         - Local tests : ``python multi_step_mnist.py run --num_training_examples 1000`` : With or without Conda. 
         - Dry run with ``python multi_step_mnist.py --with kube:cpu=3.2,memory=4000,image=tensorflow/tensorflow:latest-py3 run --num_training_examples 1000``
         - On successful dry run : ``python multi_step_mnist.py --with kube:cpu=3.2,memory=4000,image=tensorflow/tensorflow:latest-py3 kube-deploy run --num_training_examples 50000`` : Run Larger Dataset. 
-
+    - **Caveats**:
+        - `kube-deploy` is currently duplicating datasets on S3 with `IncludeFile`. This is a bug which will be fixed. 
+         
 ### Running with Conda 
 - To run with Conda it will need `'python-kubernetes':'10.0.1'` in the libraries argument to `@conda_base` step decorator
 - Use `image=python:3.6` when running with Conda in `--with kube:`. Ideally that should be the python version used/mentioned in conda.  
