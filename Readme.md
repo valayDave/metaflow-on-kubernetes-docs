@@ -119,8 +119,7 @@ This Involves the steps the admin needs to take to Setup cluster and some useful
 ### GPU Support 
 - GPU Support Documentation Available [Here](gpu.md)
 - GPU Cluster Constraints : 
-    - Cuda Libraries v9.1 on Individual Machines
-    - Docker 18.x on Machine
+    - Cuda Libraries v10.2,v9.1 on Individual Machines
     - Kubernetes Version 1.15.x, 1.16.x 
 
 ## User Guide
