@@ -121,6 +121,13 @@ This Involves the steps the admin needs to take to Setup cluster and some useful
 - GPU Cluster Constraints : 
     - Cuda Libraries v10.2,v9.1 on Individual Machines
     - Kubernetes Version 1.15.x, 1.16.x 
+- AWS Tested : p2.xlarge, p2.8xlarge
+
+### Postgres Backups and Restores. 
+- If Metaflow services are setup using `sh metaflow_cluster_services_setup.sh`, 
+    - It will Restore backup from `Metaflow_services/Local_imports`. See [Metaflow_service/postgres-restore.sh](Metaflow_service/postgres-restore.sh) for more details on backup files etc.
+- If Cluster is shutdown using `sh cleanup_cluster.sh`
+    - It will Save DB Backup to ``. See [Metaflow_service/postgres-restore.sh](Metaflow_service/postgres-restore.sh) for more details on backup files etc.
 
 ## User Guide
 

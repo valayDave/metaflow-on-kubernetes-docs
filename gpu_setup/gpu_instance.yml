@@ -9,7 +9,7 @@ spec:
   hooks:
     - execContainer:
         image: valaygaurang/nvidia-device-plugin:tesla-440.64.00
-  machineType: p2.xlarge
+  machineType: p2.8xlarge
   maxSize: 1
   minSize: 1
   nodeLabels:
