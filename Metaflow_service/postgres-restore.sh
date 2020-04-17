@@ -15,7 +15,7 @@ DATABASE_POD=$(kubectl get pod -l app=metaflow-database -o jsonpath="{.items[0].
 echo "Copying Database To Pod"
 kubectl cp $DATBASE_LOCAL_PATH $DATABASE_POD:$FINAL_POD_PATH
 
-echo "Downloading Database to Local"
+echo "Uploading Database From Local"
 kubectl exec $DATABASE_POD -- bash -c "psql -U $DATABASE_USER template1 -c 'drop database $DATABASE;'"
 kubectl exec $DATABASE_POD -- bash -c  "psql -U $DATABASE_USER template1 -c 'create database $DATABASE;'"
 kubectl exec $DATABASE_POD -- bash -c "pg_restore -C --clean --no-acl --no-owner -U $DATABASE_USER -d $DATABASE < $FINAL_POD_PATH"

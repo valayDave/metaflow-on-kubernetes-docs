@@ -60,6 +60,7 @@ if __name__== '__main__':
 - ``python multi_step_mnist.py kube kill`` : Kills all jobs on Kube. Any Metaflow Runtime accessing those jobs will be gracefully exited. 
 - ``python multi_step_mnist.py kube-deploy run`` : Will run the Metaflow Runtime inside a container on kubernetes cluster. Needs metadata service to work.  
 - ``python multi_step_mnist.py kube-deploy list`` : It will list any running deployment of the current flow on Kubernetes. 
+- ``python multi_step_mnist.py kube-deploy resume --origin-run-id`` : It will resume any previous deployment which failed. 
 
 
 # Kops Guide For Cluster Setup / Connection
@@ -183,4 +184,3 @@ export KOPS_STATE_STORE=s3://${YOUR_CLUSTER_KOPS_STATE_STORE}
 # TODO 
 
 - [ ] Integrate Minio Helm chart to this. 
-- 
