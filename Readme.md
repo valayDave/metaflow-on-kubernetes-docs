@@ -3,6 +3,9 @@
 This Repository will contain the basic scripts and files needed to setup Kubernetes cluster for running and working with Metaflow. 
 It contains Kops setup and Kubernetes templates to deploy necessary services on kubernetes. 
 
+# FYI
+I am not maintaining this repo any more as metaflow now has [first class support for Kubernetes](https://docs.metaflow.org/metaflow/scaling-out-and-up/effortless-scaling-with-kubernetes). There may be a lot of reusabe code in this repo but for actual kubernetes support check [metaflow's docs](https://docs.metaflow.org/metaflow/scaling-out-and-up/effortless-scaling-with-kubernetes)
+
 # Metaflow Kubernetes Plugin
 
 ## Installing Plugin Metaflow Repo
